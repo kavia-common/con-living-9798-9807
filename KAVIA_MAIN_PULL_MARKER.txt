@@ -1,0 +1,6 @@
+This workspace repo was updated by merging origin/kavia-main into the current branch.
+
+Timestamp (UTC): 2026-02-05
+Notes:
+- Local changes were temporarily stashed to allow a clean merge.
+- A stash-pop conflict occurred in .knowledge/.knowledge.json and was resolved by keeping the kavia-main version.
