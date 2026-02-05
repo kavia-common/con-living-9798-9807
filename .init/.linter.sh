@@ -1,0 +1,4 @@
+#!/bin/bash
+cd /home/kavia/workspace/code-generation/con-living-9798-9807/con_living_frontend
+flutter analyze
+
