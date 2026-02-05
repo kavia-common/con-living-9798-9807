@@ -1,0 +1,18 @@
+Flutter analyze report
+======================
+
+Project: con_living_frontend
+Date (UTC): 2026-02-05
+
+Command(s) executed:
+- flutter pub get
+- flutter analyze
+
+Result:
+- flutter analyze: No issues found! (ran in 16.4s)
+
+Flutter version:
+Flutter 3.29.1 • channel [user-branch] • unknown source
+Framework • revision 09de023485 (11 months ago) • 2025-02-28 13:44:05 -0800
+Engine • revision 871f65ac1b
+Tools • Dart 3.7.0 • DevTools 2.42.2
