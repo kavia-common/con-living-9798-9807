@@ -17,3 +17,4 @@ void main() {
     expect(find.byIcon(Icons.person_outline_rounded), findsOneWidget);
   });
 }
+
