@@ -1,3 +1,4 @@
+import 'package:con_living_frontend/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -6,36 +7,30 @@ void main() {
 
 /// Root application widget.
 ///
-/// This is intentionally minimal so the project compiles and runs even before
-/// additional screens/routes are wired up.
+/// This app currently boots into the pixel-perfect dashboard recreation.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  static const String dashboardRoute = '/';
+
   @override
   Widget build(BuildContext context) {
-    // If an AppTheme is added later (e.g. lib/theme/app_theme.dart),
-    // update this file to use it. For now, default ThemeData keeps it compile-ready.
     return MaterialApp(
       title: 'Con Living',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        // Keep a dark UI by default to match dashboard design.
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF7A2CFF),
+          brightness: Brightness.dark,
+        ),
+        scaffoldBackgroundColor: const Color(0xFF000000),
       ),
-      home: const _HomeScreen(),
-    );
-  }
-}
-
-class _HomeScreen extends StatelessWidget {
-  const _HomeScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Con Living'),
-      ),
+      initialRoute: dashboardRoute,
+      routes: {
+        dashboardRoute: (context) => const DashboardScreen(),
+      },
     );
   }
 }
