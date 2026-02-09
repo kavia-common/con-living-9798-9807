@@ -1,18 +1,22 @@
+import 'package:con_living_frontend/main.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:con_living_frontend/main.dart';
 
 void main() {
-  testWidgets('App generation message displayed', (WidgetTester tester) async {
+  testWidgets('Home screen header renders expected dashboard text', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
 
-    expect(find.text('con_living_frontend App is being generated...'), findsOneWidget);
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    expect(find.text('Welcome to'), findsOneWidget);
+    expect(find.text('Xfinity Mobile'), findsOneWidget);
+    expect(find.text('Your bill is due soon.'), findsOneWidget);
   });
 
-  testWidgets('App bar has correct title', (WidgetTester tester) async {
+  testWidgets('Bottom navigation renders 4 icons', (WidgetTester tester) async {
     await tester.pumpWidget(const MyApp());
 
-    expect(find.text('con_living_frontend'), findsOneWidget);
+    expect(find.byIcon(Icons.home_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.play_circle_outline_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.grid_view_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.person_outline_rounded), findsOneWidget);
   });
 }
