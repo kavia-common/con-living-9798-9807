@@ -65,6 +65,8 @@ flutter:
   assets:
     - .env
     - assets/
+    - assets/20260205_112813_dashboard.jpg
+    - assets/20260209_114149_dashboard.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
