@@ -1,3 +1,4 @@
+import 'package:con_living_frontend/features/chat/chat_empty_state_screen.dart';
 import 'package:con_living_frontend/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +13,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   static const String dashboardRoute = '/';
+  static const String chatEmptyRoute = '/chat-empty';
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +32,7 @@ class MyApp extends StatelessWidget {
       initialRoute: dashboardRoute,
       routes: {
         dashboardRoute: (context) => const DashboardScreen(),
+        chatEmptyRoute: (context) => const ChatEmptyStateScreen(),
       },
     );
   }
