@@ -1,4 +1,5 @@
 import 'package:con_living_frontend/features/chat/chat_empty_state_screen.dart';
+import 'package:con_living_frontend/features/chat/chat_loading_screen.dart';
 import 'package:con_living_frontend/features/chat/chat_page_screen.dart';
 import 'package:con_living_frontend/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
 
   static const String dashboardRoute = '/';
   static const String chatEmptyRoute = '/chat-empty';
+  static const String chatLoadingRoute = '/chat-loading';
   static const String chatPageRoute = '/chat';
 
   @override
@@ -35,6 +37,7 @@ class MyApp extends StatelessWidget {
       routes: {
         dashboardRoute: (context) => const DashboardScreen(),
         chatEmptyRoute: (context) => const ChatEmptyStateScreen(),
+        chatLoadingRoute: (context) => const ChatLoadingScreen(),
         chatPageRoute: (context) => const ChatPageScreen(),
       },
     );

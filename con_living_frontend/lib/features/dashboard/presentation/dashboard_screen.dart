@@ -1,3 +1,6 @@
+// Dashboard needs access to app route constants.
+import 'package:con_living_frontend/main.dart';
+import 'package:con_living_frontend/main.dart';
 import 'package:flutter/material.dart';
 
 /// Dashboard screen refined to match `assets/dashboard_design_notes.md`
@@ -44,7 +47,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(_padX, _padTop, _padX, _padBottom),
+            padding:
+                const EdgeInsets.fromLTRB(_padX, _padTop, _padX, _padBottom),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
@@ -63,6 +67,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // FAB flow:
+          // Dashboard -> Animated chat loading -> Chat page.
+          Navigator.of(context).pushNamed(MyApp.chatLoadingRoute);
+        },
+        backgroundColor: _accentPurple,
+        foregroundColor: _textPrimary,
+        elevation: 2,
+        child: const Icon(Icons.chat_bubble_outline_rounded, size: 22),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed(MyApp.chatLoadingRoute);
+        },
+        backgroundColor: _accentPurple,
+        foregroundColor: _textPrimary,
+        elevation: 2,
+        child: const Icon(Icons.chat_bubble_outline_rounded, size: 22),
       ),
       bottomNavigationBar: _BottomNavBar(
         selectedIndex: _selectedNavIndex,
