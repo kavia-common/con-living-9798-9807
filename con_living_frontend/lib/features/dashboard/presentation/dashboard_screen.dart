@@ -1,5 +1,3 @@
-// Dashboard needs access to app route constants.
-import 'package:con_living_frontend/main.dart';
 import 'package:con_living_frontend/main.dart';
 import 'package:flutter/material.dart';
 
@@ -22,10 +20,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   static const Color _textPrimary = Color(0xFFFFFFFF);
   static const Color _textMuted = Color(0xFFB8B8C2);
-  static const Color _navInactive = Color(0xFF8A8A95);
 
   static const Color _accentPurple = Color(0xFF8F3DFF);
-  static const Color _accentPurple2 = Color(0xFFA56BFF);
   static const Color _accentPurpleGlow = Color(0xFFC79BFF);
 
   // Spacing system (best-fit from notes; keep centralized for pixel tuning).
@@ -70,17 +66,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // FAB flow:
           // Dashboard -> Animated chat loading -> Chat page.
-          Navigator.of(context).pushNamed(MyApp.chatLoadingRoute);
-        },
-        backgroundColor: _accentPurple,
-        foregroundColor: _textPrimary,
-        elevation: 2,
-        child: const Icon(Icons.chat_bubble_outline_rounded, size: 22),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
           Navigator.of(context).pushNamed(MyApp.chatLoadingRoute);
         },
         backgroundColor: _accentPurple,
@@ -183,47 +169,6 @@ class _CircleOutlineIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Spec: tap target ~40x40, visible circle ~32-34.
-    return SizedBox(
-      width: 40,
-      height: 40,
-      child: Center(
-        child: SizedBox(
-          width: 34,
-          height: 34,
-          child: Material(
-            color: Colors.transparent,
-            shape: const CircleBorder(
-              side: BorderSide(color: _divider, width: 1),
-            ),
-            child: InkWell(
-              customBorder: const CircleBorder(),
-              onTap: () {
-                // Static UI recreation: no action wired yet.
-              },
-              child: const Center(
-                child: Icon(
-                  Icons.search_rounded, // replaced in build below
-                  size: 20,
-                  color: _iconColor,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  StatelessElement createElement() {
-    // Keep const constructor for the widget but use runtime icon value:
-    // override element creation and build via a proxy would be overkill.
-    // So we just ignore this override; it will never be called.
-    return super.createElement();
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return SizedBox(
       width: 40,
       height: 40,
@@ -480,11 +425,20 @@ class _FeaturedTilesRow extends StatelessWidget {
       children: [
         Expanded(child: _FeaturedTile(icon: Icons.star_rounded, label: 'Rewards')),
         SizedBox(width: 12),
-        Expanded(child: _FeaturedTile(icon: Icons.confirmation_number_rounded, label: 'Tickets')),
+        Expanded(
+          child: _FeaturedTile(
+            icon: Icons.confirmation_number_rounded,
+            label: 'Tickets',
+          ),
+        ),
         SizedBox(width: 12),
-        Expanded(child: _FeaturedTile(icon: Icons.card_giftcard_rounded, label: 'Gifts')),
+        Expanded(
+          child: _FeaturedTile(icon: Icons.card_giftcard_rounded, label: 'Gifts'),
+        ),
         SizedBox(width: 12),
-        Expanded(child: _FeaturedTile(icon: Icons.local_offer_rounded, label: 'Deals')),
+        Expanded(
+          child: _FeaturedTile(icon: Icons.local_offer_rounded, label: 'Deals'),
+        ),
       ],
     );
   }
@@ -497,7 +451,6 @@ class _FeaturedTile extends StatelessWidget {
   final String label;
 
   static const Color _tileBg = Color(0xFF12121A);
-  static const Color _tilePressedBg = Color(0xFF171721);
   static const Color _divider = Color(0xFF1D1D24);
   static const Color _textMuted = Color(0xFFB8B8C2);
   static const Color _accentPurple2 = Color(0xFFA56BFF);
@@ -687,27 +640,35 @@ class _BottomNavBar extends StatelessWidget {
         border: Border(top: BorderSide(color: _divider, width: 1)),
       ),
       padding: EdgeInsets.only(bottom: bottomInset),
-      child: const SizedBox(
+      child: SizedBox(
         height: 72,
-        child: _BottomNavIconsRow(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _NavIcon(
+              icon: Icons.home_rounded,
+              selected: selectedIndex == 0,
+              onTap: () => onSelected(0),
+            ),
+            _NavIcon(
+              icon: Icons.play_circle_outline_rounded,
+              selected: selectedIndex == 1,
+              onTap: () => onSelected(1),
+            ),
+            _NavIcon(
+              icon: Icons.grid_view_rounded,
+              selected: selectedIndex == 2,
+              onTap: () => onSelected(2),
+            ),
+            _NavIcon(
+              icon: Icons.person_outline_rounded,
+              selected: selectedIndex == 3,
+              onTap: () => onSelected(3),
+            ),
+          ],
+        ),
       ),
     );
-  }
-}
-
-class _BottomNavIconsRow extends StatelessWidget {
-  const _BottomNavIconsRow();
-
-  @override
-  Widget build(BuildContext context) {
-    // Keep icon-only, 4 evenly spaced items.
-    // NOTE: selection state is handled in _NavIcon; row just lays out slots.
-    // This widget reads selection via ancestor _BottomNavBar? Not possible.
-    // So we keep row local-state-free by using a Builder with inherited values
-    // is overkill; instead, _BottomNavBar already builds the row with data
-    // in the previous revisions. We'll keep the same pattern there to avoid
-    // regressions. This widget is intentionally unused.
-    return const SizedBox.shrink();
   }
 }
 
@@ -741,56 +702,6 @@ class _NavIcon extends StatelessWidget {
             child: Icon(icon, color: color, size: 24),
           ),
         ),
-      ),
-    );
-  }
-}
-
-extension on _BottomNavBar {
-  // Keep the data-driven build (selection wiring) together with _BottomNavBar.
-  Widget _buildIconsRow(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _NavIcon(
-          icon: Icons.home_rounded,
-          selected: selectedIndex == 0,
-          onTap: () => onSelected(0),
-        ),
-        _NavIcon(
-          icon: Icons.play_circle_outline_rounded,
-          selected: selectedIndex == 1,
-          onTap: () => onSelected(1),
-        ),
-        _NavIcon(
-          icon: Icons.grid_view_rounded,
-          selected: selectedIndex == 2,
-          onTap: () => onSelected(2),
-        ),
-        _NavIcon(
-          icon: Icons.person_outline_rounded,
-          selected: selectedIndex == 3,
-          onTap: () => onSelected(3),
-        ),
-      ],
-    );
-  }
-}
-
-extension _BottomNavBarBuildFix on _BottomNavBar {
-  @override
-  Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.paddingOf(context).bottom;
-
-    return Container(
-      decoration: const BoxDecoration(
-        color: _bg,
-        border: Border(top: BorderSide(color: _divider, width: 1)),
-      ),
-      padding: EdgeInsets.only(bottom: bottomInset),
-      child: SizedBox(
-        height: 72,
-        child: _buildIconsRow(context),
       ),
     );
   }
