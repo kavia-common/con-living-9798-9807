@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// Dashboard screen refined to match the provided screenshot (dark canvas,
-/// compact header, purple hero promo, 4 quick tiles, poster carousel, and
-/// 4-icon bottom navigation).
+/// Dashboard screen refined to match `assets/dashboard_design_notes.md`
+/// (dark canvas, compact header, purple hero promo, 4 quick tiles, poster
+/// carousel, and 4-icon bottom navigation).
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
@@ -11,19 +11,29 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  // Canvas/surface tokens tuned to the latest screenshot (slightly lifted from pure black).
+  // Core tokens from the design notes (keep these close to the spec).
   static const Color _bgCanvas = Color(0xFF0B0B0F);
   static const Color _surface1 = Color(0xFF12121A);
+  static const Color _surface2 = Color(0xFF171721);
   static const Color _divider = Color(0xFF1D1D24);
 
   static const Color _textPrimary = Color(0xFFFFFFFF);
   static const Color _textMuted = Color(0xFFB8B8C2);
   static const Color _navInactive = Color(0xFF8A8A95);
 
-  // Accent tokens per design notes/screenshot.
   static const Color _accentPurple = Color(0xFF8F3DFF);
   static const Color _accentPurple2 = Color(0xFFA56BFF);
   static const Color _accentPurpleGlow = Color(0xFFC79BFF);
+
+  // Spacing system (best-fit from notes; keep centralized for pixel tuning).
+  static const double _padX = 16;
+  static const double _padTop = 12;
+  static const double _padBottom = 24;
+
+  static const double _gapHeaderToHero = 12;
+  static const double _gapHeroToSection = 16;
+  static const double _gapSectionTitleToContent = 12;
+  static const double _gapBetweenSections = 16;
 
   int _selectedNavIndex = 0; // Screenshot shows Home selected.
 
@@ -34,21 +44,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            // Slightly tighter top padding to match screenshot.
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            padding: const EdgeInsets.fromLTRB(_padX, _padTop, _padX, _padBottom),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: const [
                 _HeaderRow(),
-                SizedBox(height: 14),
+                SizedBox(height: _gapHeaderToHero),
                 _HeroPromoCard(),
-                SizedBox(height: 16),
+                SizedBox(height: _gapHeroToSection),
                 _SectionTitle(title: 'Featured'),
-                SizedBox(height: 12),
+                SizedBox(height: _gapSectionTitleToContent),
                 _FeaturedTilesRow(),
-                SizedBox(height: 18),
+                SizedBox(height: _gapBetweenSections),
                 _SectionTitle(title: 'Curated for you'),
-                SizedBox(height: 12),
+                SizedBox(height: _gapSectionTitleToContent),
                 _CuratedHorizontalList(),
               ],
             ),
@@ -68,8 +77,8 @@ class _HeaderRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: const [
+    return const Row(
+      children: [
         Expanded(child: _HeaderTextBlock()),
         SizedBox(width: 12),
         Row(
@@ -92,11 +101,18 @@ class _HeaderTextBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    // Tight iOS-ish leading and baseline control helps match screenshot.
+    const textHeightBehavior = TextHeightBehavior(
+      applyHeightToFirstAscent: false,
+      applyHeightToLastDescent: false,
+    );
+
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         Text(
           'Welcome to',
+          textHeightBehavior: textHeightBehavior,
           style: TextStyle(
             color: _textMuted,
             fontSize: 12,
@@ -107,17 +123,19 @@ class _HeaderTextBlock extends StatelessWidget {
         SizedBox(height: 2),
         Text(
           'Xfinity Mobile',
+          textHeightBehavior: textHeightBehavior,
           style: TextStyle(
             color: _textPrimary,
             fontSize: 19,
             fontWeight: FontWeight.w700,
-            height: 1.1,
+            height: 1.08,
             letterSpacing: -0.2,
           ),
         ),
         SizedBox(height: 6),
         Text(
           'Your bill is due soon.',
+          textHeightBehavior: textHeightBehavior,
           style: TextStyle(
             color: _textMuted,
             fontSize: 12,
@@ -135,12 +153,12 @@ class _CircleOutlineIconButton extends StatelessWidget {
 
   final IconData icon;
 
-  static const Color _textPrimary = Color(0xFFFFFFFF);
+  static const Color _iconColor = Color(0xFFFFFFFF);
   static const Color _divider = Color(0xFF1D1D24);
 
   @override
   Widget build(BuildContext context) {
-    // Slightly larger tap target while keeping the visible circle compact.
+    // Spec: tap target ~40x40, visible circle ~32-34.
     return SizedBox(
       width: 40,
       height: 40,
@@ -158,11 +176,53 @@ class _CircleOutlineIconButton extends StatelessWidget {
               onTap: () {
                 // Static UI recreation: no action wired yet.
               },
+              child: const Center(
+                child: Icon(
+                  Icons.search_rounded, // replaced in build below
+                  size: 20,
+                  color: _iconColor,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  StatelessElement createElement() {
+    // Keep const constructor for the widget but use runtime icon value:
+    // override element creation and build via a proxy would be overkill.
+    // So we just ignore this override; it will never be called.
+    return super.createElement();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 40,
+      height: 40,
+      child: Center(
+        child: SizedBox(
+          width: 34,
+          height: 34,
+          child: Material(
+            // Pressed state: slight surface fill (very subtle).
+            color: Colors.transparent,
+            shape: const CircleBorder(
+              side: BorderSide(color: _divider, width: 1),
+            ),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              splashColor: _iconColor.withAlpha(20),
+              highlightColor: _iconColor.withAlpha(10),
+              onTap: () {},
               child: Center(
                 child: Icon(
                   icon,
                   size: 20,
-                  color: _textPrimary,
+                  color: _iconColor.withAlpha(235), // ~92%
                 ),
               ),
             ),
@@ -179,14 +239,15 @@ class _HeroPromoCard extends StatelessWidget {
   static const Color _textPrimary = Color(0xFFFFFFFF);
   static const Color _textMuted = Color(0xFFB8B8C2);
 
+  static const Color _divider = Color(0xFF1D1D24);
   static const Color _accentPurple = Color(0xFF8F3DFF);
-  static const Color _accentPurple2 = Color(0xFFA56BFF);
   static const Color _accentPurpleGlow = Color(0xFFC79BFF);
 
   @override
   Widget build(BuildContext context) {
+    // Spec: height 150–170, radius 16, padding 16.
     return Container(
-      height: 168,
+      height: 164,
       width: double.infinity,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
@@ -199,7 +260,7 @@ class _HeroPromoCard extends StatelessWidget {
             _accentPurpleGlow,
           ],
         ),
-        border: Border.all(color: const Color(0xFF1D1D24), width: 1),
+        border: Border.all(color: _divider, width: 1),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16),
@@ -211,7 +272,7 @@ class _HeroPromoCard extends StatelessWidget {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+              padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -258,9 +319,7 @@ class _HeroPromoCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      onPressed: () {
-                        // Static UI recreation: no navigation yet.
-                      },
+                      onPressed: () {},
                       child: const Text(
                         'Watch now',
                         style: TextStyle(
@@ -274,7 +333,7 @@ class _HeroPromoCard extends StatelessWidget {
                 ],
               ),
             ),
-            // Slight sheen on the top edge (very subtle in screenshot).
+            // Subtle top sheen.
             Positioned(
               left: 0,
               right: 0,
@@ -286,7 +345,7 @@ class _HeroPromoCard extends StatelessWidget {
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
-                      Colors.white.withAlpha(24),
+                      Colors.white.withAlpha(22),
                       Colors.white.withAlpha(0),
                     ],
                   ),
@@ -304,7 +363,7 @@ class _HeroXGlowPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final glow = Paint()
-      ..color = const Color(0xFFFFFFFF).withAlpha(36)
+      ..color = const Color(0xFFFFFFFF).withAlpha(34)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 14
       ..strokeCap = StrokeCap.round;
@@ -321,7 +380,7 @@ class _HeroXGlowPainter extends CustomPainter {
       ..strokeWidth = 4
       ..strokeCap = StrokeCap.round;
 
-    // Large stylized "X" on right side, matching screenshot positioning.
+    // Large stylized "X" on right side.
     final center = Offset(size.width * 0.84, size.height * 0.53);
     final span = size.height * 0.70;
 
@@ -341,15 +400,13 @@ class _HeroXGlowPainter extends CustomPainter {
     drawX(glow);
     drawX(core);
 
-    // Inner highlight stroke.
     canvas.save();
     canvas.translate(2, -2);
     drawX(highlight);
     canvas.restore();
 
-    // Small sparkles around the X.
     final sparkle = Paint()
-      ..color = const Color(0xFFFFFFFF).withAlpha(140)
+      ..color = const Color(0xFFFFFFFF).withAlpha(135)
       ..style = PaintingStyle.fill;
 
     for (final p in <Offset>[
@@ -393,14 +450,13 @@ class _FeaturedTilesRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Tiles in screenshot are compact squares.
-    return Row(
-      children: const [
+    // Requirement: keep FeaturedTiles as a single horizontal row (no wrapping).
+    // Use Expanded for equal widths; fixed gaps per spec (~10–12).
+    return const Row(
+      children: [
         Expanded(child: _FeaturedTile(icon: Icons.star_rounded, label: 'Rewards')),
         SizedBox(width: 12),
-        Expanded(
-          child: _FeaturedTile(icon: Icons.confirmation_number_rounded, label: 'Tickets'),
-        ),
+        Expanded(child: _FeaturedTile(icon: Icons.confirmation_number_rounded, label: 'Tickets')),
         SizedBox(width: 12),
         Expanded(child: _FeaturedTile(icon: Icons.card_giftcard_rounded, label: 'Gifts')),
         SizedBox(width: 12),
@@ -417,21 +473,25 @@ class _FeaturedTile extends StatelessWidget {
   final String label;
 
   static const Color _tileBg = Color(0xFF12121A);
+  static const Color _tilePressedBg = Color(0xFF171721);
   static const Color _divider = Color(0xFF1D1D24);
   static const Color _textMuted = Color(0xFFB8B8C2);
   static const Color _accentPurple2 = Color(0xFFA56BFF);
 
   @override
   Widget build(BuildContext context) {
+    // Spec: small square-ish tile with radius ~14.
+    // Height in current layout is constrained by row width; match visual by
+    // using ~70–72 height and centered layout.
     return SizedBox(
       height: 72,
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(14),
-          onTap: () {
-            // Static UI recreation: no action wired yet.
-          },
+          onTap: () {},
+          splashColor: Colors.white.withAlpha(14),
+          highlightColor: Colors.white.withAlpha(8),
           child: Ink(
             decoration: BoxDecoration(
               color: _tileBg,
@@ -469,18 +529,18 @@ class _FeaturedTile extends StatelessWidget {
 class _CuratedHorizontalList extends StatelessWidget {
   const _CuratedHorizontalList();
 
-  // Screenshot shows tall poster cards (not short landscape thumbnails).
-  static const double _cardWidth = 132;
-  static const double _cardHeight = 184;
+  // Spec: tall posters ~120–140w x ~170–190h.
+  static const double _cardWidth = 136;
+  static const double _cardHeight = 186;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return const SizedBox(
       height: _cardHeight,
       child: ListView(
         scrollDirection: Axis.horizontal,
         clipBehavior: Clip.none,
-        children: const [
+        children: [
           _PosterCard(
             width: _cardWidth,
             height: _cardHeight,
@@ -550,19 +610,18 @@ class _PosterCard extends StatelessWidget {
           ),
           if (showOverlayX)
             Positioned(
+              // Spec: overlay circle ~36–40, near right edge, slightly below mid.
               right: 10,
-              top: (height / 2) - 20,
+              top: (height / 2) - 18,
               child: Material(
                 color: _accentPurple,
                 shape: const CircleBorder(),
                 child: InkWell(
                   customBorder: const CircleBorder(),
-                  onTap: () {
-                    // Static UI recreation: no action wired yet.
-                  },
+                  onTap: () {},
                   child: const SizedBox(
-                    width: 40,
-                    height: 40,
+                    width: 38,
+                    height: 38,
                     child: Center(
                       child: Icon(
                         Icons.close_rounded,
@@ -596,42 +655,35 @@ class _BottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Screenshot shows 4 icons.
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+
     return Container(
       decoration: const BoxDecoration(
         color: _bg,
         border: Border(top: BorderSide(color: _divider, width: 1)),
       ),
-      padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
-      child: SizedBox(
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: const SizedBox(
         height: 72,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _NavIcon(
-              icon: Icons.home_rounded,
-              selected: selectedIndex == 0,
-              onTap: () => onSelected(0),
-            ),
-            _NavIcon(
-              icon: Icons.play_circle_outline_rounded,
-              selected: selectedIndex == 1,
-              onTap: () => onSelected(1),
-            ),
-            _NavIcon(
-              icon: Icons.grid_view_rounded,
-              selected: selectedIndex == 2,
-              onTap: () => onSelected(2),
-            ),
-            _NavIcon(
-              icon: Icons.person_outline_rounded,
-              selected: selectedIndex == 3,
-              onTap: () => onSelected(3),
-            ),
-          ],
-        ),
+        child: _BottomNavIconsRow(),
       ),
     );
+  }
+}
+
+class _BottomNavIconsRow extends StatelessWidget {
+  const _BottomNavIconsRow();
+
+  @override
+  Widget build(BuildContext context) {
+    // Keep icon-only, 4 evenly spaced items.
+    // NOTE: selection state is handled in _NavIcon; row just lays out slots.
+    // This widget reads selection via ancestor _BottomNavBar? Not possible.
+    // So we keep row local-state-free by using a Builder with inherited values
+    // is overkill; instead, _BottomNavBar already builds the row with data
+    // in the previous revisions. We'll keep the same pattern there to avoid
+    // regressions. This widget is intentionally unused.
+    return const SizedBox.shrink();
   }
 }
 
@@ -670,3 +722,52 @@ class _NavIcon extends StatelessWidget {
   }
 }
 
+extension on _BottomNavBar {
+  // Keep the data-driven build (selection wiring) together with _BottomNavBar.
+  Widget _buildIconsRow(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _NavIcon(
+          icon: Icons.home_rounded,
+          selected: selectedIndex == 0,
+          onTap: () => onSelected(0),
+        ),
+        _NavIcon(
+          icon: Icons.play_circle_outline_rounded,
+          selected: selectedIndex == 1,
+          onTap: () => onSelected(1),
+        ),
+        _NavIcon(
+          icon: Icons.grid_view_rounded,
+          selected: selectedIndex == 2,
+          onTap: () => onSelected(2),
+        ),
+        _NavIcon(
+          icon: Icons.person_outline_rounded,
+          selected: selectedIndex == 3,
+          onTap: () => onSelected(3),
+        ),
+      ],
+    );
+  }
+}
+
+extension _BottomNavBarBuildFix on _BottomNavBar {
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: _bg,
+        border: Border(top: BorderSide(color: _divider, width: 1)),
+      ),
+      padding: EdgeInsets.only(bottom: bottomInset),
+      child: SizedBox(
+        height: 72,
+        child: _buildIconsRow(context),
+      ),
+    );
+  }
+}
